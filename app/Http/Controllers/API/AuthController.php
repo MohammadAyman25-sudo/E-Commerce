@@ -18,10 +18,10 @@ class AuthController extends Controller
         ]);
         if ($validator->fails()) {
             return response()->json([
-                "status" => 0,
-                "message" => "validation error",
+                "status" => 400,
+                "message" => "Validation Error",
                 "data" => $validator->errors()->all()
-            ]);
+            ], 400);
         }
 
         $user = User::create([
@@ -36,7 +36,7 @@ class AuthController extends Controller
         $response['email'] = $user->email;
 
         return response()->json([
-            "status" => 1,
+            "status" => 200,
             "message" => "User Registered",
             "data" => $response,
         ]);
@@ -49,10 +49,10 @@ class AuthController extends Controller
         ]);
         if ($validator->fails()) {
             return response()->json([
-                "status" => 401,
-                "message" => "invalid credentials",
+                "status" => 400,
+                "message" => "Invalid Credentials",
                 "data" => $validator->errors()->all(),
-            ]);
+            ], 400);
         }
         if (Auth::attempt(["email"=>$request->email, "password" => $request->password], $request->boolean('remember_me'))){
             $user = Auth::user();
@@ -71,6 +71,22 @@ class AuthController extends Controller
             'status' => 401,
             'message' => "User Unauthenticated",
             'data' => null
+        ], 401);
+    }
+
+    public function logout(string $id) {
+        if (auth()->id() != $id) {
+            return response()->json([
+                'status' => 403,
+                'message' => 'Unauthorized Action.',
+                'data' => null,
+            ], 403);
+        }
+        auth()->user()->tokens()->delete();
+        return response()->json([
+            'status' => 200,
+            'message' => "User Logged Out",
+            'data' => null,
         ]);
     }
 }

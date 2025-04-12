@@ -12,9 +12,16 @@ class Product extends Model
         'price',
         'description',
         'stock_quantity',
+        'image_paths',
     ];
 
-    public function images() {
-        return $this->hasMany(ProductImages::class);
+    protected function casts() {
+        return [
+            'image_paths' => 'array',
+        ];
+    }
+
+    public function order_items() {
+        return $this->hasMany(OrderItem::class);
     }
 }
